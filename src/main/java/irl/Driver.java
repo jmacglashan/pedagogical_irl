@@ -36,7 +36,8 @@ public class Driver {
 	SADomain domain = AMTGridGenerator.domain();
 	int [][] colorMap = AMTGridGenerator.coloredSquareMap();
 	IRLFeatures features = new IRLFeatures(colorMap);
-	PGridRF rf = new PGridRF(5, 2, features);
+	//PGridRF rf = new PGridRF(5, 2, features);
+	PGridRF rf = new PGridCostRF(5, 2, features);
 	TerminalFunction tf = new GridWorldTerminalFunction(5, 2);
 
 
@@ -86,11 +87,16 @@ public class Driver {
 		request.setBoltzmannBeta(beta);
 
 		//run MLIRL on it
-		MLIRL irl = new MLIRL(request, 0.1, 0.1, 10);
+		MLIRL irl = new MLIRL(request, 0.01, 0.1, 10);
 		irl.toggleDebugPrinting(false);
 		irl.performIRL();
 
 		double [] params = rf.params.clone();
+		if(rf instanceof PGridCostRF){
+			for(int i = 0; i < params.length; i++){
+				params[i] *= -1 * params[i];
+			}
+		}
 		return params;
 
 	}
@@ -174,8 +180,22 @@ public class Driver {
 //		String dataPath = "model_pedagogy_trials.json";
 //		String outPath = "irl_model_pedagogy.json";
 
-		String dataPath = "model_standard_trials.json";
-		String outPath = "irl_model_standard.json";
+//		String dataPath = "model_standard_trials.json";
+//		String outPath = "irl_model_standard.json";
+
+
+//		String dataPath = "new_set/human_doing_trials.json";
+//		String outPath = "new_set/irl_human_doing.json";
+
+		String dataPath = "new_set/human_showing_trials.json";
+		String outPath = "new_set/irl_human_showing_0.01.json";
+
+//		String dataPath = "new_set/model_pedagogy_trials.json";
+//		String outPath = "new_set/irl_model_pedagogy.json";
+
+//		String dataPath = "new_set/model_standard_trials.json";
+//		String outPath = "new_set/irl_model_standard.json";
+
 
 		Parser p = new Parser(driver.domain);
 		p.toggleDebugPrinting();
